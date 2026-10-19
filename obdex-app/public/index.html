@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OBDEX Vehicle Check</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Free MOT history and full HPI check for any UK vehicle.">
+<meta name="theme-color" content="#151515">
+<link rel="icon" type="image/png" href="assets/app-icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <button class="brand" type="button" data-home aria-label="OBDEX home">
+      <img class="logo logo-on-dark" src="assets/logo-light.png" alt="OBDEX" width="160" height="32">
+      <img class="logo logo-on-light" src="assets/logo-dark.png" alt="OBDEX" width="160" height="32">
+    </button>
+    <span class="source-chip" id="source-chip" hidden></span>
+  </div>
+</header>
+<main id="app" class="wrap" aria-live="polite"></main>
+<footer class="wrap footer">
+  <p>MOT data from the DVSA MOT history service. History checks supplied by a third-party data provider.</p>
+</footer>
+<script src="js/mock.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

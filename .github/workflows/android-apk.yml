@@ -1,0 +1,36 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+    paths: ['obdex-mobile/**', '.github/workflows/android-apk.yml']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: obdex-mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: obdex-mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npx expo prebuild --platform android --no-install
+      - run: ./gradlew assembleRelease --no-daemon
+        working-directory: obdex-mobile/android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: obdex-android-apk
+          path: obdex-mobile/android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error

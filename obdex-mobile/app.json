@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "OBDEX",
+    "slug": "obdex",
+    "scheme": "obdex",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#1C1C1C",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.obdex.app"
+    },
+    "android": {
+      "package": "com.obdex.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#1C1C1C",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-image",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "backgroundColor": "#1C1C1C",
+          "imageWidth": 120
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

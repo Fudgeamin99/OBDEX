@@ -1,0 +1,12 @@
+{
+  "name": "obdex",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OBDEX: UK vehicle MOT history and HPI check web app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build:preview": "node scripts/build-preview.js"
+  },
+  "engines": { "node": ">=18" }
+}
