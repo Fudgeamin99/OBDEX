@@ -12,6 +12,7 @@ let html = read('index.html');
 let css = read('css/app.css').replace('url("../assets/icon.png")', `url("${dataUri('assets/icon.png')}")`);
 html = html
   .replace('<link rel="stylesheet" href="css/app.css">', () => `<style>\n${css}\n</style>`)
+  .replace('<script src="js/plate.js"></script>', () => `<script>\n${read('js/plate.js')}\n</script>`)
   .replace('<script src="js/mock.js"></script>', () => `<script>\n${read('js/mock.js')}\n</script>`)
   .replace('<script src="js/app.js"></script>', () => `<script>\n${read('js/app.js')}\n</script>`)
   .replace(/src="(assets\/[^"]+\.png)"/g, (_, p) => `src="${dataUri(p)}"`)

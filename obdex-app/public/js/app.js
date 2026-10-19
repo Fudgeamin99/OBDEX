@@ -337,12 +337,14 @@
 
   // ---------- actions ----------
   function check(reg) {
-    reg = cleanReg(reg);
-    if (!/^[A-Z0-9]{2,8}$/.test(reg)) {
+    var plate = OBDEXPlate.check(reg);
+    if (!plate.valid) {
       var e = document.getElementById('form-error');
-      if (e) { e.textContent = 'Enter a UK registration, like AB12 CDE.'; e.hidden = false; }
+      if (e) { e.textContent = plate.reason; e.hidden = false; }
+      else { state.reg = plate.reg; state.error = plate.reason; state.view = 'error'; render(); }
       return;
     }
+    reg = plate.reg;
     state.reg = reg; state.view = 'loading'; state.tab = 'overview';
     render();
     fetchVehicle(reg).then(function (data) {
@@ -371,5 +373,5 @@
   document.querySelectorAll('header [data-home]').forEach(function (b) { b.addEventListener('click', goHome); });
 
   var initial = cleanReg(location.hash.slice(1));
-  if (/^[A-Z0-9]{2,8}$/.test(initial)) check(initial); else render();
+  if (initial) check(initial); else render();
 })();

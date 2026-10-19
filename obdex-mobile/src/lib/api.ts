@@ -1,4 +1,5 @@
-import { clean, mockDvla, mockReport } from './mock';
+import { mockDvla, mockReport } from './mock';
+import { checkPlate } from './plate';
 import type { VehicleReport } from './types';
 
 // The OBDEX server (obdex-app) holds the DVSA, DVLA and HPI keys. Point the
@@ -7,11 +8,10 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
 
 export class LookupError extends Error {}
 
-export const isValidReg = (reg: string) => /^[A-Z0-9]{2,8}$/.test(clean(reg));
-
 export async function fetchVehicle(regIn: string): Promise<VehicleReport> {
-  const reg = clean(regIn);
-  if (!isValidReg(reg)) throw new LookupError('Enter a UK registration, like AB12 CDE.');
+  const plate = checkPlate(regIn);
+  if (!plate.valid) throw new LookupError(plate.reason);
+  const reg = plate.reg;
   if (!API_URL) {
     await new Promise((r) => setTimeout(r, 450)); // feel like a real lookup
     return mockReport(reg);

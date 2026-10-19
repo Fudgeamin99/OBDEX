@@ -13,6 +13,7 @@ loadEnv(path.join(__dirname, '.env'));
 const mot = require('./lib/mot');
 const hpi = require('./lib/hpi');
 const dvla = require('./lib/dvla');
+const plate = require('./public/js/plate.js');
 
 const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC = path.join(__dirname, 'public');
@@ -20,7 +21,6 @@ const TYPES = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript',
   '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json', '.json': 'application/json'
 };
-const REG_RE = /^[A-Z0-9]{2,8}$/;
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
@@ -29,18 +29,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { mot: mot.configured() ? 'dvsa' : 'demo', dvla: dvla.configured() ? 'dvla' : 'demo', hpi: hpi.providerName() });
     }
     const m = url.pathname.match(/^\/api\/vehicle\/([^/]+)$/);
-    if (m) {
-      const reg = decodeURIComponent(m[1]).toUpperCase().replace(/[^A-Z0-9]/g, '');
-      if (!REG_RE.test(reg)) return json(res, 400, { error: 'Enter a UK registration, like AB12 CDE.' });
-      const [motResult, hpiResult, dvlaResult] = await Promise.all([mot.lookup(reg), hpi.lookup(reg), dvla.lookup(reg)]);
-      return json(res, 200, {
-        registration: reg,
-        sources: { mot: motResult.source, hpi: hpiResult.source, dvla: dvlaResult.source },
-        mot: motResult.data,
-        dvla: dvlaResult.data,
-        hpi: hpiResult.data
-      });
-    }
+    if (m) return json(res, 200, await vehicleReport(decodeURIComponent(m[1])));
     if (url.pathname.startsWith('/api/')) return json(res, 404, { error: 'Not found' });
     return serveStatic(url.pathname, res);
   } catch (err) {
@@ -49,6 +38,46 @@ const server = http.createServer(async (req, res) => {
     return json(res, status, { error: status === 500 ? 'Something went wrong. Try again.' : err.message });
   }
 });
+
+// Looks a plate up with the DVLA and DVSA. A plate in a valid format that
+// neither service knows is rejected, so only registered vehicles get a report.
+async function vehicleReport(input) {
+  const p = plate.check(input);
+  if (!p.valid) throw new mot.HttpError(400, p.reason);
+  const reg = p.reg;
+  const [motResult, dvlaResult] = await Promise.all([mot.lookup(reg), dvla.lookup(reg)]);
+  const live = motResult.source !== 'demo' || dvlaResult.source !== 'demo';
+  const found = (motResult.source !== 'demo' && motResult.data) || (dvlaResult.source !== 'demo' && dvlaResult.data);
+  if (live && !found) {
+    throw new mot.HttpError(404, `${p.pretty} is not registered with the DVLA. Check the number plate and try again.`);
+  }
+  const motData = motResult.data || fromDvla(reg, dvlaResult.data);
+  const hpiResult = await hpi.lookup(reg);
+  return {
+    registration: reg,
+    sources: { mot: motResult.source, dvla: dvlaResult.source, hpi: hpiResult.source },
+    mot: motData,
+    dvla: dvlaResult.data,
+    hpi: hpiResult.data
+  };
+}
+
+// A vehicle with no MOT yet (under three years old) still gets a report from its DVLA record.
+function fromDvla(reg, d) {
+  const first = d.monthOfFirstRegistration ? `${d.monthOfFirstRegistration}-01` : null;
+  return {
+    registration: reg,
+    make: d.make || '',
+    model: '',
+    firstUsedDate: first,
+    registrationDate: first,
+    fuelType: d.fuelType,
+    primaryColour: d.colour,
+    engineSize: d.engineCapacity ? String(d.engineCapacity) : undefined,
+    motTestDueDate: d.motExpiryDate,
+    motTests: []
+  };
+}
 
 function serveStatic(pathname, res) {
   let file = path.normalize(path.join(PUBLIC, decodeURIComponent(pathname)));

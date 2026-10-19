@@ -43,12 +43,22 @@ For providers that need more than one call, add a new adapter to the `providers`
 
 The mileage check does not need a provider: it is worked out from the MOT odometer readings.
 
+## Number plate checks
+
+`public/js/plate.js` rejects registrations that cannot exist: wrong shape, an area code or age identifier that has never been issued, or letters the DVLA does not use. The server runs the same check, then asks the DVSA and DVLA. When keys are set and neither service knows the plate, it answers 404 "not registered with the DVLA", so the app never shows a report for a made-up plate. A new car with no MOT yet still gets a report from its DVLA record.
+
+## Hosting
+
+The phone app needs the server on the internet. `render.yaml` at the repository root sets it up on Render: create a Blueprint from the repository, paste the keys when asked, and use the address Render gives you as `OBDEX_API_URL`. Any host that runs `node server.js` with Node 18 or newer works the same way.
+
 ## How it fits together
 
 | Path | What it does |
 | --- | --- |
 | `server.js` | Serves the app and `GET /api/vehicle/:reg` |
 | `lib/mot.js` | DVSA sign-in (OAuth client credentials) and MOT lookup |
+| `lib/dvla.js` | DVLA Vehicle Enquiry Service lookup (tax and vehicle details) |
+| `public/js/plate.js` | UK number plate format check, shared by server and browser |
 | `lib/hpi.js` | Pluggable history-check provider |
 | `public/js/app.js` | The whole front end: search, report, MOT timeline, HPI checks, mileage chart |
 | `public/js/mock.js` | Demo data in the same shape as the real APIs |

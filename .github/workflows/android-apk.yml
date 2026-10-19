@@ -12,6 +12,11 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # The hosted OBDEX server (obdex-app) that holds the DVSA and DVLA keys.
+      # Set it under Settings > Secrets and variables > Actions > Variables.
+      # Left empty, the APK runs on demo data.
+      EXPO_PUBLIC_API_URL: ${{ vars.OBDEX_API_URL }}
     defaults:
       run:
         working-directory: obdex-mobile

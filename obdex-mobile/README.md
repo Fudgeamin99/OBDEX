@@ -25,6 +25,9 @@ The phone app never holds API keys. It asks the OBDEX server in `../obdex-app`, 
    - `DVLA_API_KEY`: DVLA Vehicle Enquiry Service for tax (free)
    - `HPI_*`: your paid history-check provider
 2. Copy `.env.example` to `.env` here and set `EXPO_PUBLIC_API_URL` to the server address.
+3. For the APK that GitHub builds, add a repository variable `OBDEX_API_URL` with the server address (Settings > Secrets and variables > Actions > Variables), then re-run the Android APK workflow.
+
+Number plates are checked twice. The app rejects anything that is not a real UK format (for example an area code or age identifier that has never been issued) before it asks the server. Once the server has its DVSA and DVLA keys, it also rejects any plate that neither service knows, so only registered vehicles get a report.
 
 ## Publish to the App Store and Google Play
 

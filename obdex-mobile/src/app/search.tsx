@@ -5,8 +5,9 @@ import { Pressable, TextInput, View } from 'react-native';
 import { GarageRow } from '@/components/GarageRow';
 import { Button, Header, noOutline, Screen, T } from '@/components/ui';
 import { prettyReg, title } from '@/lib/analysis';
-import { fetchVehicle, isValidReg, LookupError, usingDemoData } from '@/lib/api';
-import { clean, SAMPLE_REGS } from '@/lib/mock';
+import { fetchVehicle, LookupError, usingDemoData } from '@/lib/api';
+import { SAMPLE_REGS } from '@/lib/mock';
+import { checkPlate } from '@/lib/plate';
 import { useStore } from '@/lib/store';
 import { brand, font, useTheme } from '@/lib/theme';
 
@@ -19,8 +20,9 @@ export default function Search() {
   const [busy, setBusy] = useState(false);
 
   async function go(value = reg) {
-    const r = clean(value);
-    if (!isValidReg(r)) { setError('Enter a UK registration, like AB12 CDE.'); return; }
+    const plate = checkPlate(value);
+    if (!plate.valid) { setError(plate.reason); return; }
+    const r = plate.reg;
     setError('');
     if (next === 'garage') {
       setBusy(true);

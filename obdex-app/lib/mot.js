@@ -1,6 +1,7 @@
 'use strict';
 // MOT data from the DVSA MOT History API (https://documentation.history.mot.api.gov.uk/).
 // Falls back to demo data when credentials are not configured.
+// Returns data: null when DVSA holds no MOT record for the plate.
 
 const mock = require('../public/js/mock.js');
 
@@ -39,7 +40,7 @@ async function lookup(reg) {
       Accept: 'application/json'
     }
   });
-  if (res.status === 404) throw new HttpError(404, 'No vehicle found with that registration.');
+  if (res.status === 404) return { source: 'dvsa', data: null }; // no MOT record for this plate
   if (res.status === 401 || res.status === 403) { cachedToken = null; throw new HttpError(502, 'DVSA rejected the API credentials.'); }
   if (res.status === 429) throw new HttpError(429, 'Too many lookups. Try again in a minute.');
   if (!res.ok) throw new HttpError(502, `DVSA lookup failed (${res.status})`);

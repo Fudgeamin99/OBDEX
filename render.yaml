@@ -1,0 +1,24 @@
+# One-click hosting for the OBDEX server on Render (render.com).
+# Keys are entered in the Render dashboard, never committed.
+services:
+  - type: web
+    name: obdex-api
+    runtime: node
+    rootDir: obdex-app
+    plan: free
+    buildCommand: echo "no build step"
+    startCommand: node server.js
+    healthCheckPath: /api/status
+    envVars:
+      - key: MOT_CLIENT_ID
+        sync: false
+      - key: MOT_CLIENT_SECRET
+        sync: false
+      - key: MOT_API_KEY
+        sync: false
+      - key: MOT_TOKEN_URL
+        sync: false
+      - key: DVLA_API_KEY
+        sync: false
+      - key: HPI_PROVIDER
+        value: demo
