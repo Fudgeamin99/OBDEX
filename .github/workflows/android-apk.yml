@@ -6,6 +6,9 @@ on:
     paths: ['obdex-mobile/**', '.github/workflows/android-apk.yml']
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,3 +37,12 @@ jobs:
           name: obdex-android-apk
           path: obdex-mobile/android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
+      - name: Publish to the android-latest release
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk OBDEX.apk
+          gh release delete android-latest --yes --cleanup-tag || true
+          gh release create android-latest OBDEX.apk --prerelease --target "$GITHUB_SHA" \
+            --title "OBDEX Android (latest build)" \
+            --notes "Built from $GITHUB_SHA. Download OBDEX.apk on your Android phone and open it to install."
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -9,6 +9,8 @@ UK vehicle MOT, tax and HPI checks.
 
 ## Android APK
 
-Every push to `main` that changes `obdex-mobile` builds an APK with GitHub Actions. Open the **Actions** tab, choose the latest **Android APK** run and download **obdex-android-apk** under Artifacts. You can also start a build by hand from the same page with **Run workflow**.
+**Download the latest build:** [OBDEX.apk](https://github.com/Fudgeamin99/OBDEX/releases/download/android-latest/OBDEX.apk). Open the link on your Android phone and install it (allow installs from your browser if asked).
+
+Every push to `main` that changes `obdex-mobile` builds a new APK with GitHub Actions and replaces that download. The build is also kept under Artifacts: open the **Actions** tab, choose the latest **Android APK** run and download **obdex-android-apk** under Artifacts. You can also start a build by hand from the same page with **Run workflow**.
 
 ![Screens](obdex-mobile/screens-preview.png)
