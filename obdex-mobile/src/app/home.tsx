@@ -4,6 +4,7 @@ import type { ComponentProps } from 'react';
 import { Alert, Pressable, View } from 'react-native';
 import { Avatar } from '@/components/Avatar';
 import { GarageRow } from '@/components/GarageRow';
+import { UpdateBanner } from '@/components/UpdateBanner';
 import { LogoTile, Screen, T } from '@/components/ui';
 import { prettyReg } from '@/lib/analysis';
 import { useStore } from '@/lib/store';
@@ -31,6 +32,8 @@ export default function Home() {
         </View>
         <Pressable onPress={() => router.push('/profile')} accessibilityLabel="Profile"><Avatar name={state.user?.name} /></Pressable>
       </View>
+
+      <UpdateBanner />
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
         {tiles.map((t) => (

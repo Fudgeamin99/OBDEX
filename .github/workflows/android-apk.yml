@@ -17,6 +17,8 @@ jobs:
       # Set it under Settings > Secrets and variables > Actions > Variables.
       # Left empty, the APK runs on demo data.
       EXPO_PUBLIC_API_URL: ${{ vars.OBDEX_API_URL }}
+      # Lets the app spot when a newer build is on the android-latest release.
+      EXPO_PUBLIC_BUILD_SHA: ${{ github.sha }}
     defaults:
       run:
         working-directory: obdex-mobile

@@ -1,10 +1,18 @@
 import { Feather } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { Alert, Platform, Pressable, View } from 'react-native';
 import { Avatar } from '@/components/Avatar';
 import { Button, Header, IconBox, Screen, T, type IconName } from '@/components/ui';
 import { useStore } from '@/lib/store';
 import { brand, useTheme } from '@/lib/theme';
+import { checkForUpdate, installUpdate, RELEASE_PAGE } from '@/lib/updates';
+
+async function onCheckUpdates() {
+  const u = await checkForUpdate();
+  if (u.status === 'available') Alert.alert('Update available', 'A new version of OBDEX is ready.', [{ text: 'Later', style: 'cancel' }, { text: 'Update', onPress: () => installUpdate(u.url) }]);
+  else if (u.status === 'current') Alert.alert('You are up to date', 'This is the latest version of OBDEX.');
+  else installUpdate(RELEASE_PAGE); // could not check, so show the release page
+}
 
 export default function Profile() {
   const p = useTheme();
@@ -35,6 +43,14 @@ export default function Profile() {
             <Feather name="chevron-right" size={18} color={p.text} />
           </Pressable>
         ))}
+        {Platform.OS === 'android' && (
+          <Pressable onPress={onCheckUpdates} accessibilityRole="button"
+            style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 18, borderBottomWidth: 1, borderBottomColor: p.line, opacity: pressed ? 0.7 : 1 })}>
+            <Feather name="download" size={18} color={brand.orange} />
+            <T size={15} style={{ flex: 1 }}>Check for updates</T>
+            <Feather name="chevron-right" size={18} color={p.text} />
+          </Pressable>
+        )}
       </View>
     </Screen>
   );
