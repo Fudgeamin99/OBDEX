@@ -9,6 +9,11 @@ on:
 permissions:
   contents: write
 
+# Only the newest push publishes; an older build still running is cancelled.
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -48,8 +53,14 @@ jobs:
         run: |
           cp android/app/build/outputs/apk/release/app-release.apk OBDEX.apk
           gh release delete android-latest --yes --cleanup-tag || true
-          gh release create android-latest OBDEX.apk --prerelease --target "$GITHUB_SHA" \
-            --title "OBDEX Android (latest build)" \
-            --notes "Built from $GITHUB_SHA. Download OBDEX.apk on your Android phone and open it to install."
+          # GitHub can take a moment to forget the deleted tag, so retry the create.
+          for attempt in 1 2 3 4 5 6; do
+            gh release create android-latest OBDEX.apk --prerelease --target "$GITHUB_SHA" \
+              --title "OBDEX Android (latest build)" \
+              --notes "Built from $GITHUB_SHA. Download OBDEX.apk on your Android phone and open it to install." && exit 0
+            echo "Release create failed (attempt $attempt), retrying"
+            sleep $((attempt * 10))
+          done
+          exit 1
         env:
           GH_TOKEN: ${{ github.token }}
